@@ -1,0 +1,24 @@
+{
+  "name": "web-socket",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lindsayjohnston/web-socket.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lindsayjohnston/web-socket/issues"
+  },
+  "homepage": "https://github.com/lindsayjohnston/web-socket#readme",
+  "engines": {
+    "node": "12.17.x"
+  }
+}
