@@ -7,7 +7,7 @@ const { Server } = require('ws');
 const PORT = process.env.PORT || 3000;
 const INDEX = '/index.html';
 
-const messages = [] //[{ from: <username>, message: <message>}]
+let messages = [] //[{ from: <username>, message: <message>}]
 
 const server = express()
   .use((req, res) => res.sendFile(INDEX, { root: __dirname }))
@@ -21,14 +21,15 @@ wss.on('connection', (ws) => {
     const dataParsed = JSON.parse(data)
     messages.push(dataParsed)
     wss.clients.forEach((client) => {
-      console.log("CLIENT:")
-      console.log(client)
       client.send(JSON.stringify(messages));
     });
     const message = dataParsed.message
     console.log('received: %s', message)
   })
-  ws.on('close', () => console.log('Client disconnected'));
+  ws.on('close', () => {
+    console.log('Client disconnected');
+    messages = [];
+  });
 });
 
 

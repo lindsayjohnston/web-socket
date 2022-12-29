@@ -7,8 +7,29 @@
     let ws = new WebSocket(HOST);
     let el;
 
+    let messages = []
+
     ws.onmessage = (event) => {
       console.log(event.data)
+      const messagesContainer = document.getElementById("messages")
+      while(messagesContainer.firstChild){
+        messagesContainer.removeChild(messagesContainer.firstChild)
+      }
+
+      const dataParsed = JSON.parse(event.data)
+      for (let message in dataParsed) {
+        const messageElement = document.createElement("div")
+        const pElement = document.createElement("p")
+        const text = document.createTextNode(dataParsed[message].message)
+        pElement.appendChild(text)
+        if (dataParsed[message].from === "user1") {
+          messageElement.classList.add("user1-message")
+        } else {
+          messageElement.classList.add("user2-message")
+        }
+        messageElement.appendChild(pElement)
+        messagesContainer.appendChild(messageElement)
+      }
     };
 
     function sendMessage1() {
@@ -82,18 +103,21 @@
   <input id="user2-message" placeholder="User 2 Message" />
   <button onclick="sendMessage2()">Send User 2 Message</button>
 
-  <div class="message-record">
+  <div id="message-record">
 
     <div class="headers">
       <h2>User 1 Messages</h2>
       <h2>User 2 Messages</h2>
     </div>
-    <div class="user1-message">
-      <p>This is a test</p>
+    <div id="messages">
+      <div class="user1-message">
+        <p>This is a test</p>
+      </div>
+      <div class="user2-message">
+        <p>This is a test</p>
+      </div>
     </div>
-    <div class="user2-message">
-      <p>This is a test</p>
-    </div>
+
 
   </div>
 </body>
