@@ -16,7 +16,7 @@
       const input = document.getElementById("user1-message")
       const message = input.value;
       input.value = "";
-      ws.send(JSON.stringify({"from": "user1", "message": message}))
+      ws.send(JSON.stringify({ "from": "user1", "message": message }))
     }
 
     function sendMessage2() {
@@ -24,7 +24,7 @@
       const input = document.getElementById("user2-message")
       const message = input.value;
       input.value = "";
-      ws.send(JSON.stringify({"from": "user2", "message": message}))
+      ws.send(JSON.stringify({ "from": "user2", "message": message }))
     }
   </script>
   <style>
@@ -33,18 +33,24 @@
       width: 100%;
       min-height: 400px;
       display: flex;
-      flex-direction: row;
-    }
-
-    .message-output {
-      border: 1px solid salmon;
-      width: 50%;
-      height: 100%;
-      display: flex;
       flex-direction: column;
     }
 
-    #user1-message-output p {
+    .headers {
+      border: 1px solid salmon;
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    .user1-message {
+      width: 100%;
+      border: 1px solid blue;
+      display: flex;
+    }
+
+    .user1-message p {
       width: 200px;
       padding: 10px;
       background-color: darkslategray;
@@ -52,13 +58,14 @@
       margin-bottom: 10px;
     }
 
-    #user2-message-output {
+    .user2-message {
+      width: 100%;
+      border: 1px solid blue;
       display: flex;
       justify-content: end;
     }
 
-
-    #user2-message-output p {
+    .user2-message p {
       width: 200px;
       padding: 10px;
       background-color: darkmagenta;
@@ -76,18 +83,18 @@
   <button onclick="sendMessage2()">Send User 2 Message</button>
 
   <div class="message-record">
-    <div class="message-output">
+
+    <div class="headers">
+      <h2>User 1 Messages</h2>
       <h2>User 2 Messages</h2>
-      <div id="user1-message-output">
-        <p>This is a test</p>
-      </div>
     </div>
-    <div class="message-output">
-      <h2>User 2 Messages</h2>
-      <div id="user2-message-output">
-        <p>This is a test</p>
-      </div>
+    <div class="user1-message">
+      <p>This is a test</p>
     </div>
+    <div class="user2-message">
+      <p>This is a test</p>
+    </div>
+
   </div>
 </body>
 
