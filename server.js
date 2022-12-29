@@ -1,5 +1,6 @@
 'use strict';
 
+const { json } = require('body-parser');
 const express = require('express');
 const { Server } = require('ws');
 
@@ -17,7 +18,9 @@ const wss = new Server({ server });
 wss.on('connection', (ws) => {
   console.log('Client connected');
   ws.on('message', function message(data){
-    console.log('received: %s', data)
+    const dataParsed = JSON.parse(data)
+    const message = dataParsed.message
+    console.log('received: %s', message)
   })
   ws.on('close', () => console.log('Client disconnected'));
 });

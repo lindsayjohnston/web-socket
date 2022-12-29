@@ -12,9 +12,20 @@
       el.innerHTML = 'Server time: ' + event.data;
     };
 
-    function test() {
-      console.log("test")
-      ws.send("This is a message")
+    function sendMessage1() {
+      console.log("test1")
+      const input = document.getElementById("user1-message")
+      const message = input.value;
+      input.value = "";
+      ws.send(JSON.stringify({"from": "user1", "message": message}))
+    }
+
+    function sendMessage2() {
+      console.log("test2")
+      const input = document.getElementById("user2-message")
+      const message = input.value;
+      input.value = "";
+      ws.send(JSON.stringify({"from": "user2", "message": message}))
     }
   </script>
   <style>
@@ -61,9 +72,9 @@
 <body>
   <p id="server-time"></p>
   <input id="user1-message" placeholder="User 1 Message" />
-  <button onclick="test()">Send User 1 Message</button>
+  <button onclick="sendMessage1()">Send User 1 Message</button>
   <input id="user2-message" placeholder="User 2 Message" />
-  <button onclick="test()">Send User 2 Message</button>
+  <button onclick="sendMessage2()">Send User 2 Message</button>
 
   <div class="message-record">
     <div class="message-output">
