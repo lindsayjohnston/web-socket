@@ -8,8 +8,7 @@
     let el;
 
     ws.onmessage = (event) => {
-      el = document.getElementById('server-time');
-      el.innerHTML = 'Server time: ' + event.data;
+      console.log(event.data)
     };
 
     function sendMessage1() {

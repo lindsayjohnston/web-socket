@@ -19,6 +19,12 @@ wss.on('connection', (ws) => {
   console.log('Client connected');
   ws.on('message', function message(data){
     const dataParsed = JSON.parse(data)
+    messages.push(dataParsed)
+    wss.clients.forEach((client) => {
+      console.log("CLIENT:")
+      console.log(client)
+      client.send(JSON.stringify(messages));
+    });
     const message = dataParsed.message
     console.log('received: %s', message)
   })
@@ -29,11 +35,11 @@ wss.on('connection', (ws) => {
 
 
 
-setInterval(() => {
-  wss.clients.forEach((client) => {
-    client.send(new Date().toTimeString());
-  });
-}, 1000);
+// setInterval(() => {
+//   wss.clients.forEach((client) => {
+//     client.send(new Date().toTimeString());
+//   });
+// }, 1000);
 
 // const express = require('express');
 // const http = require('http');
