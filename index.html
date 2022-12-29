@@ -1,24 +1,84 @@
 <html>
-  <head>
-    <!-- test -->
-    <script>
-      let HOST = location.origin.replace(/^http/, 'ws')
-      let ws = new WebSocket(HOST);
-      let el;
 
-      ws.onmessage = (event) => {
-        el = document.getElementById('server-time');
-        el.innerHTML = 'Server time: ' + event.data;
-      };
+<head>
+  <!-- test -->
+  <script>
+    let HOST = location.origin.replace(/^http/, 'ws')
+    let ws = new WebSocket(HOST);
+    let el;
 
-      function test(){
-        console.log("test")
-        ws.send("This is a message")
-      }
-    </script>
-  </head>
-  <body>
-    <p id="server-time"></p>
-    <button onclick="test()">Click me</button>
-  </body>
+    ws.onmessage = (event) => {
+      el = document.getElementById('server-time');
+      el.innerHTML = 'Server time: ' + event.data;
+    };
+
+    function test() {
+      console.log("test")
+      ws.send("This is a message")
+    }
+  </script>
+  <style>
+    .message-record {
+      border: 1px solid green;
+      width: 100%;
+      min-height: 400px;
+      display: flex;
+      flex-direction: row;
+    }
+
+    .message-output {
+      border: 1px solid salmon;
+      width: 50%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #user1-message-output p {
+      width: 200px;
+      padding: 10px;
+      background-color: darkslategray;
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    #user2-message-output {
+      display: flex;
+      justify-content: end;
+    }
+
+
+    #user2-message-output p {
+      width: 200px;
+      padding: 10px;
+      background-color: darkmagenta;
+      color: white;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <p id="server-time"></p>
+  <input id="user1-message" placeholder="User 1 Message" />
+  <button onclick="test()">Send User 1 Message</button>
+  <input id="user2-message" placeholder="User 2 Message" />
+  <button onclick="test()">Send User 2 Message</button>
+
+  <div class="message-record">
+    <div class="message-output">
+      <h2>User 2 Messages</h2>
+      <div id="user1-message-output">
+        <p>This is a test</p>
+      </div>
+    </div>
+    <div class="message-output">
+      <h2>User 2 Messages</h2>
+      <div id="user2-message-output">
+        <p>This is a test</p>
+      </div>
+    </div>
+  </div>
+</body>
+
 </html>
