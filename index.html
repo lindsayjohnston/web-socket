@@ -10,9 +10,15 @@
         el = document.getElementById('server-time');
         el.innerHTML = 'Server time: ' + event.data;
       };
+
+      function test(){
+        console.log("test")
+        ws.send("This is a message")
+      }
     </script>
   </head>
   <body>
     <p id="server-time"></p>
+    <button onclick="test()">Click me</button>
   </body>
 </html>
