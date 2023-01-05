@@ -7,7 +7,7 @@ const { Server } = require('ws');
 const PORT = process.env.PORT || 3000;
 const INDEX = '/index.html';
 
-let messages = [] //[{ from: <username>, message: <message>}]
+let messages = { type: "messageArray", messages: [] } //[{ from: <username>, message: <message>}]
 const users = {}
 //{"seat1": 
 //  username: null, -- will be string chosen by user
@@ -38,22 +38,37 @@ wss.on('connection', (ws) => {
   let userId = "seat" + userNumber
   ws.id = userId
   users[userId] = {}
-  console.log("Let's see if there's a user id set...")
-  console.log(ws.id)
 
+  //let client choose username
+  ws.send(JSON.stringify({ type: "chooseUsername" }))
 
   ws.on('message', function message(data) {
+
     const dataParsed = JSON.parse(data)
-    messages.push(dataParsed)
-    wss.clients.forEach((client) => {
-      client.send(JSON.stringify(messages));
-    });
-    const message = dataParsed.message
-    console.log('received: %s', message)
+    console.log(dataParsed)
+    if (dataParsed.type === "usernameChoice") {
+      console.log(ws.id + " chose username:")
+      console.log(dataParsed.username)
+      users[ws.id].username = dataParsed.username
+      console.log("users should be updated now:")
+      console.log(users)
+      
+    } 
+    
+    if (dataParsed.type === "message") {
+      console.log("Receiving message")
+      console.log(dataParsed.data)
+      messages["messages"].push(dataParsed.data)
+      wss.clients.forEach((client) => {
+        client.send(JSON.stringify(messages));
+      });
+    }
+
   })
+
   ws.on('close', () => {
     console.log('Client disconnected');
-    messages = [];
+    messages = { "type": "messageArray", "messages": [] };
   });
 });
 
