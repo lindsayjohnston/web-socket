@@ -8,6 +8,20 @@ const PORT = process.env.PORT || 3000;
 const INDEX = '/index.html';
 
 let messages = [] //[{ from: <username>, message: <message>}]
+const users = {}
+//{"seat1": 
+//  username: null, -- will be string chosen by user
+//  chatsWith: {
+//      "user2": [messagesArray1],
+//      "user3": [messagesArray2]
+//  },
+//{"seat2": 
+//  username: null,
+//  chatsWith: {
+//      "user1": [messagesArray1],
+//      "user3": [messagesArray2]
+//  },
+//}
 
 const server = express()
   .use((req, res) => res.sendFile(INDEX, { root: __dirname }))
@@ -16,8 +30,19 @@ const server = express()
 const wss = new Server({ server });
 
 wss.on('connection', (ws) => {
-  console.log('Client connected');
-  ws.on('message', function message(data){
+  console.log('Client connected!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+
+  //Offer available seats to client
+  const seatArray = Object.keys(users)
+  const userNumber = seatArray.length
+  let userId = "seat" + userNumber
+  ws.id = userId
+  users[userId] = {}
+  console.log("Let's see if there's a user id set...")
+  console.log(ws.id)
+
+
+  ws.on('message', function message(data) {
     const dataParsed = JSON.parse(data)
     messages.push(dataParsed)
     wss.clients.forEach((client) => {
