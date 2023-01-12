@@ -94,6 +94,10 @@
 
     function sendMessageTo (username) {
       console.log("Sending message to " + username)
+      const input = document.getElementById(`message-${username}-input`)
+      const message = input.value;
+      input.value = "";
+      ws.send(JSON.stringify({type: "message", data: {from : myUsername, to: username, "message" : message}}))
     }
 
     function sendMessage1() {

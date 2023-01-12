@@ -9,6 +9,7 @@ const INDEX = '/index.html';
 
 let messages = { type: "messageArray", messages: [] } //[{ from: <username>, message: <message>}]
 const usernames = []
+const chats = { "lucy+amy" : [], "ann+toby" : []}
 const users = {}
 //{"seat1": 
 //  username: null, -- will be string chosen by user
@@ -47,7 +48,6 @@ wss.on('connection', (ws) => {
   ws.send(JSON.stringify({ type: "chooseUsername" }))
 
   ws.on('message', function message(data) {
-
     const dataParsed = JSON.parse(data)
     console.log(dataParsed)
 
@@ -69,12 +69,35 @@ wss.on('connection', (ws) => {
       })
     } 
     
-    if (dataParsed.type === "message") {                                            //Receive message
+    if (dataParsed.type === "message") { 
+      //find out who the two people are
+      const fromChatter = dataParsed.data.from
+      const toChatter = dataParsed.data.to
+
+      //see if they exist in the chats object or their reversed names exist
+      const fromToChats = chats[`${fromChatter}+${toChatter}`] 
+      if(!fromToChats){
+        const toFromChats= chats[`${toChatter}+${fromChatter}`] 
+        if(!toFromChats){
+          //create at fromToChats
+          chats[`${fromChatter}+${toChatter}`] =[{from: dataParsed.data.from, message: dataParsed.data.message}]  //[{ from: <username>, message: <message>}]
+        }else{
+          //add to toFromChats
+          chats[`${toChatter}+${fromChatter}`].push({from: dataParsed.data.from, message: dataParsed.data.message})
+        }
+      } else{
+        //add to fromToChats
+        chats[`${fromChatter}+${toChatter}`].push({from: dataParsed.data.from, message: dataParsed.data.message})
+      }
+
+          //if not make them exist
+      //add the message object to the message array
+      //send the message object to both clients
       console.log("Receiving message")
       console.log(dataParsed.data)
       messages["messages"].push(dataParsed.data)
       wss.clients.forEach((client) => {
-        client.send(JSON.stringify(messages));
+        client.send(JSON.stringify(chats));
       });
     }
 
