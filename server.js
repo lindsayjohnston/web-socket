@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 3000;
 const INDEX = '/index.html';
 
 let messages = { type: "messageArray", messages: [] } //[{ from: <username>, message: <message>}]
+const usernames = []
 const users = {}
 //{"seat1": 
 //  username: null, -- will be string chosen by user
@@ -31,8 +32,11 @@ const wss = new Server({ server });
 
 wss.on('connection', (ws) => {
   console.log('Client connected!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+  // console.log(wss.clients)
+  console.log(`${wss.clients.size} clients connected`)
 
   //Offer available seats to client
+  //check if that client already has a seat
   const seatArray = Object.keys(users)
   const userNumber = seatArray.length
   let userId = "seat" + userNumber
@@ -46,16 +50,26 @@ wss.on('connection', (ws) => {
 
     const dataParsed = JSON.parse(data)
     console.log(dataParsed)
-    if (dataParsed.type === "usernameChoice") {
+
+    if (dataParsed.type === "usernameChoice") {                                     //Choose Username
       console.log(ws.id + " chose username:")
       console.log(dataParsed.username)
       users[ws.id].username = dataParsed.username
       console.log("users should be updated now:")
       console.log(users)
-      
+
+      ws.username = dataParsed.username
+      usernames.push(dataParsed.username)
+      //confirm that the username was set
+      ws.send(JSON.stringify({type: "getUsername", username : ws.username}))
+
+      //send the updated username list to all clients
+      wss.clients.forEach((client)=>{
+        client.send(JSON.stringify({type: "usernameList", usernames: usernames}))
+      })
     } 
     
-    if (dataParsed.type === "message") {
+    if (dataParsed.type === "message") {                                            //Receive message
       console.log("Receiving message")
       console.log(dataParsed.data)
       messages["messages"].push(dataParsed.data)

@@ -34,6 +34,26 @@
         }
       } else if (dataParsed.type === "chooseUsername") {
         console.log("CHOOSE USERNAME!!!")
+      } else if (dataParsed.type === "getUsername") {
+        console.log(dataParsed)
+        document.getElementById("username-label").innerHTML = `Now chatting as ${dataParsed.username}`
+        document.getElementById("choose-username-button").setAttribute("disabled", true)
+        document.getElementById("start-chatting-div").classList.remove("hidden")
+      } else if(dataParsed.type === "usernameList"){
+        console.log(dataParsed.usernames)
+        //update the list of usernames
+        if(dataParsed.usernames.length !== 0){
+          document.getElementById("nobody-here").classList.add("display-none")
+          const list = document.getElementById("username-list")
+          dataParsed.usernames.forEach(element => {
+            const newUser = document.createElement("button")
+            newUser.setAttribute("id", element)
+            newUser.setAttribute("class", "user-button")
+            const text = document.createTextNode(element)
+            newUser.appendChild(text)
+            list.appendChild(newUser)
+          });
+        }
       } else {
         console.log("Not sure what to do with this type of data...")
         console.log(dataParsed)
@@ -109,19 +129,47 @@
       color: white;
       margin-bottom: 10px;
     }
+
+    #username-label {
+      color: darkblue
+    }
+
+    .display-none {
+      display: none
+    }
+
+    .hidden {
+      visibility: hidden;
+    }
+
+    #username-list{
+      display: flex;
+      flex-direction: column;
+    }
   </style>
 </head>
 
 <body>
   <input id="username-input" />
-  <button onclick="submitUsername()">Choose Username</button>
+  <button id="choose-username-button" onclick="submitUsername()">Choose Username</button>
 
-  <input id="user1-message" placeholder="User 1 Message" />
-  <button onclick="sendMessage1()">Send User 1 Message</button>
-  <input id="user2-message" placeholder="User 2 Message" />
-  <button onclick="sendMessage2()">Send User 2 Message</button>
+  <div id="start-chatting-div" class="hidden">
+    <h2 id="username-label"></h2>
+    <p>Choose a friend to chat with:</p>
+    <div id="username-list">
+      <p id="nobody-here">Nobody here quite yet</p>
+    </div>
+  </div>
 
-  <div id="message-record">
+  <div id="send-message-div" class="hidden">
+    <input id="user1-message" placeholder="User 1 Message" />
+    <button onclick="sendMessage1()">Send Message</button>
+  </div>
+
+  <!-- <input id="user2-message" placeholder="User 2 Message" />
+  <button onclick="sendMessage2()">Send User 2 Message</button> -->
+
+  <div id="message-record" class="display-none">
 
     <div class="headers">
       <h2>User 1 Messages</h2>
