@@ -8,9 +8,9 @@
     let el;
 
     let messages = []
+    let myUsername = "";
 
     ws.onmessage = (event) => {
-
       const dataParsed = JSON.parse(event.data)
 
       if (dataParsed.type === "messageArray") {
@@ -36,6 +36,7 @@
         console.log("CHOOSE USERNAME!!!")
       } else if (dataParsed.type === "getUsername") {
         console.log(dataParsed)
+        myUsername= dataParsed.username
         document.getElementById("username-label").innerHTML = `Now chatting as ${dataParsed.username}`
         document.getElementById("choose-username-button").setAttribute("disabled", true)
         document.getElementById("start-chatting-div").classList.remove("hidden")
@@ -52,6 +53,10 @@
             const text = document.createTextNode(element)
             newUser.appendChild(text)
             list.appendChild(newUser)
+            if(element === myUsername){
+              newUser.setAttribute("disabled", true)
+            }
+            document.getElementById(element).addEventListener("click", ()=>openChatWithUser(element))
           });
         }
       } else {
@@ -60,6 +65,36 @@
       }
 
     };
+
+    function openChatWithUser (username){
+      console.log("OPENING CHAT WITH " + username)
+      const chatsArea = document.getElementById("chats")
+      const chatBox = document.createElement("div")
+      chatBox.setAttribute("id", `chatbox-with-${username}`)
+      const heading = document.createElement("h3")
+      const headingText = document.createTextNode("Chat with " + username + "...")
+      heading.appendChild(headingText)
+      chatBox.appendChild(heading)
+      chatsArea.appendChild(chatBox)
+
+      const messageArea = document.createElement("div")
+      messageArea.setAttribute("id", `messages-with-${username}`)
+      chatBox.appendChild(messageArea)
+      const messageInput = document.createElement("input")
+      messageInput.setAttribute("id", `message-${username}-input`)
+      chatBox.appendChild(messageInput)
+
+      const sendMessageBtn = document.createElement("button")
+      sendMessageBtn.setAttribute("id", `send-to-${username}-button`)
+      const buttonText = document.createTextNode("Send a message to " + username)
+      sendMessageBtn.appendChild(buttonText)
+      chatBox.appendChild(sendMessageBtn)
+      document.getElementById(`send-to-${username}-button`).addEventListener("click", ()=> sendMessageTo(username))
+    }
+
+    function sendMessageTo (username) {
+      console.log("Sending message to " + username)
+    }
 
     function sendMessage1() {
       console.log("test1")
@@ -155,7 +190,7 @@
 
   <div id="start-chatting-div" class="hidden">
     <h2 id="username-label"></h2>
-    <p>Choose a friend to chat with:</p>
+    <p>Friends online:</p>
     <div id="username-list">
       <p id="nobody-here">Nobody here quite yet</p>
     </div>
@@ -169,8 +204,9 @@
   <!-- <input id="user2-message" placeholder="User 2 Message" />
   <button onclick="sendMessage2()">Send User 2 Message</button> -->
 
-  <div id="message-record" class="display-none">
+  <div id="chats"></div>
 
+  <div id="message-record" class="display-none">
     <div class="headers">
       <h2>User 1 Messages</h2>
       <h2>User 2 Messages</h2>
