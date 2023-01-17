@@ -38,11 +38,11 @@ wss.on('connection', (ws) => {
 
   //Offer available seats to client
   //check if that client already has a seat
-  const seatArray = Object.keys(users)
-  const userNumber = seatArray.length
-  let userId = "seat" + userNumber
-  ws.id = userId
-  users[userId] = {}
+  // const seatArray = Object.keys(users)
+  // const userNumber = seatArray.length
+  // let userId = "seat" + userNumber
+  // ws.id = userId
+  // users[userId] = {}
 
   //let client choose username
   ws.send(JSON.stringify({ type: "chooseUsername" }))
@@ -52,14 +52,18 @@ wss.on('connection', (ws) => {
     console.log(dataParsed)
 
     if (dataParsed.type === "usernameChoice") {                                     //Choose Username
-      console.log(ws.id + " chose username:")
-      console.log(dataParsed.username)
-      users[ws.id].username = dataParsed.username
-      console.log("users should be updated now:")
-      console.log(users)
-
       ws.username = dataParsed.username
-      usernames.push(dataParsed.username)
+      let usernameAlreadyAdded = false
+      for(let i = 0; i< usernames.length; i++){
+        if(usernames[i] === dataParsed.username){
+          usernameAlreadyAdded = true
+        }
+      }
+
+      if(!usernameAlreadyAdded){
+        usernames.push(dataParsed.username)
+      }
+      
       //confirm that the username was set
       ws.send(JSON.stringify({type: "getUsername", username : ws.username}))
 
@@ -97,7 +101,7 @@ wss.on('connection', (ws) => {
       console.log(dataParsed.data)
       messages["messages"].push(dataParsed.data)
       wss.clients.forEach((client) => {
-        client.send(JSON.stringify(chats));
+        client.send(JSON.stringify({type: "chatsObject", chatsObject: chats}));
       });
     }
 
