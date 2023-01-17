@@ -8,22 +8,9 @@ const PORT = process.env.PORT || 3000;
 const INDEX = '/index.html';
 
 let messages = { type: "messageArray", messages: [] } //[{ from: <username>, message: <message>}]
-const usernames = []
-const chats = { "lucy+amy" : [], "ann+toby" : []}
-const users = {}
-//{"seat1": 
-//  username: null, -- will be string chosen by user
-//  chatsWith: {
-//      "user2": [messagesArray1],
-//      "user3": [messagesArray2]
-//  },
-//{"seat2": 
-//  username: null,
-//  chatsWith: {
-//      "user1": [messagesArray1],
-//      "user3": [messagesArray2]
-//  },
-//}
+let usernames = []
+let chats = {}
+
 
 const server = express()
   .use((req, res) => res.sendFile(INDEX, { root: __dirname }))
@@ -46,6 +33,7 @@ wss.on('connection', (ws) => {
 
   //let client choose username
   ws.send(JSON.stringify({ type: "chooseUsername" }))
+  ws.send(JSON.stringify({ type: "chatsObject", chatsObject: chats }));
 
   ws.on('message', function message(data) {
     const dataParsed = JSON.parse(data)
@@ -54,57 +42,64 @@ wss.on('connection', (ws) => {
     if (dataParsed.type === "usernameChoice") {                                     //Choose Username
       ws.username = dataParsed.username
       let usernameAlreadyAdded = false
-      for(let i = 0; i< usernames.length; i++){
-        if(usernames[i] === dataParsed.username){
+      for (let i = 0; i < usernames.length; i++) {
+        if (usernames[i] === dataParsed.username) {
           usernameAlreadyAdded = true
         }
       }
 
-      if(!usernameAlreadyAdded){
+      if (!usernameAlreadyAdded) {
         usernames.push(dataParsed.username)
       }
-      
+
       //confirm that the username was set
-      ws.send(JSON.stringify({type: "getUsername", username : ws.username}))
+      ws.send(JSON.stringify({ type: "getUsername", username: ws.username }))
 
       //send the updated username list to all clients
-      wss.clients.forEach((client)=>{
-        client.send(JSON.stringify({type: "usernameList", usernames: usernames}))
+      wss.clients.forEach((client) => {
+        client.send(JSON.stringify({ type: "usernameList", usernames: usernames }))
       })
-    } 
-    
-    if (dataParsed.type === "message") { 
+    } else if (dataParsed.type === "message") {
       //find out who the two people are
       const fromChatter = dataParsed.data.from
       const toChatter = dataParsed.data.to
-
       //see if they exist in the chats object or their reversed names exist
-      const fromToChats = chats[`${fromChatter}+${toChatter}`] 
-      if(!fromToChats){
-        const toFromChats= chats[`${toChatter}+${fromChatter}`] 
-        if(!toFromChats){
+      const fromToChats = chats[`${fromChatter}+${toChatter}`]
+      if (!fromToChats) {
+        const toFromChats = chats[`${toChatter}+${fromChatter}`]
+        if (!toFromChats) {
           //create at fromToChats
-          chats[`${fromChatter}+${toChatter}`] =[{from: dataParsed.data.from, message: dataParsed.data.message}]  //[{ from: <username>, message: <message>}]
-        }else{
+          chats[`${fromChatter}+${toChatter}`] = [{ from: dataParsed.data.from, message: dataParsed.data.message }]  //[{ from: <username>, message: <message>}]
+        } else {
           //add to toFromChats
-          chats[`${toChatter}+${fromChatter}`].push({from: dataParsed.data.from, message: dataParsed.data.message})
+          chats[`${toChatter}+${fromChatter}`].push({ from: dataParsed.data.from, message: dataParsed.data.message })
         }
-      } else{
+      } else {
         //add to fromToChats
-        chats[`${fromChatter}+${toChatter}`].push({from: dataParsed.data.from, message: dataParsed.data.message})
+        chats[`${fromChatter}+${toChatter}`].push({ from: dataParsed.data.from, message: dataParsed.data.message })
       }
-
-          //if not make them exist
-      //add the message object to the message array
-      //send the message object to both clients
       console.log("Receiving message")
       console.log(dataParsed.data)
       messages["messages"].push(dataParsed.data)
       wss.clients.forEach((client) => {
-        client.send(JSON.stringify({type: "chatsObject", chatsObject: chats}));
+        client.send(JSON.stringify({ type: "chatsObject", chatsObject: chats }));
       });
+    } else if (dataParsed.type === "clearServerData") {
+      console.log("Need to clear server here")
+      messages = { type: "messageArray", messages: [] } //[{ from: <username>, message: <message>}]
+      usernames = []
+      chats = {}
+      //send updates to clients
+      wss.clients.forEach((client) => {
+        client.send(JSON.stringify({ type: "usernameList", usernames: usernames }))
+      })
+      wss.clients.forEach((client) => {
+        client.send(JSON.stringify({ type: "chatsObject", chatsObject: chats }));
+      });
+    } else {
+      console.log("I don't know what to do with this message from the client: ")
+      console.log(dataParsed)
     }
-
   })
 
   ws.on('close', () => {
